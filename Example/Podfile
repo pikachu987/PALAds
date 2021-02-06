@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '9.0'
+
+target 'PALAds_Example' do
+  pod 'PALAds', :path => '../'
+
+  target 'PALAds_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

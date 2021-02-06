@@ -1,0 +1,6 @@
+framework module PALExtension {
+  umbrella header "PALExtension-umbrella.h"
+
+  export *
+  module * { export * }
+}

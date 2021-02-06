@@ -1,0 +1,6 @@
+framework module Pods_PALAds_Tests {
+  umbrella header "Pods-PALAds_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}
