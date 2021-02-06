@@ -36,31 +36,31 @@ extension Ads {
         public var initialKey: String = ""
         public var initialCount: Int = 0
 
-        public class func update(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
+        open class func update(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
             self.shared.update(adUnitID, defaultKey: defaultKey, defaultCount: defaultCount)
         }
 
-        public class func updateInitial(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
+        open class func updateInitial(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
             self.shared.updateInitial(adUnitID, defaultKey: defaultKey, defaultCount: defaultCount)
         }
 
-        public class func load(_ viewController: UIViewController, adsType: AdsType, callback: (() -> Void)? = nil) {
+        open class func load(_ viewController: UIViewController, adsType: AdsType, callback: (() -> Void)? = nil) {
             self.shared.load(viewController, adsType: adsType, callback: callback)
         }
 
-        public func update(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
+        open func update(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
             self.defaultAdUnitID = adUnitID
             self.defaultKey = defaultKey
             self.defaultCount = defaultCount
         }
         
-        public func updateInitial(_ adUnitID: String, defaultKey: String, defaultCount: Int = 3) {
+        open func updateInitial(_ adUnitID: String, defaultKey: String, defaultCount: Int = 3) {
             self.initialAdUnitID = adUnitID
             self.initialKey = defaultKey
             self.initialCount = defaultCount
         }
         
-        public func load(_ viewController: UIViewController, adsType: AdsType, callback: (() -> Void)? = nil) {
+        open func load(_ viewController: UIViewController, adsType: AdsType, callback: (() -> Void)? = nil) {
             var adUnitID = ""
             var key = ""
             var count = 0

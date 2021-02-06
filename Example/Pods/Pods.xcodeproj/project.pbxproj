@@ -1846,7 +1846,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				MODULEMAP_FILE = "Target Support Files/PALAds/PALAds.modulemap";
 				PRODUCT_MODULE_NAME = PALAds;
 				PRODUCT_NAME = PALAds;
@@ -2040,7 +2040,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				MODULEMAP_FILE = "Target Support Files/PALAds/PALAds.modulemap";
 				PRODUCT_MODULE_NAME = PALAds;
 				PRODUCT_NAME = PALAds;

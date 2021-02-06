@@ -25,13 +25,13 @@ import PALExtension
 open class Ads: NSObject {
     public weak var viewController: UIViewController?
     
-    public static func start(_ callback: ((GADInitializationStatus) -> Void)? = nil) {
+    open class func start(_ callback: ((GADInitializationStatus) -> Void)? = nil) {
         GADMobileAds.sharedInstance().start { (GADInitializationStatus) in
             callback?(GADInitializationStatus)
         }
     }
 
-    public func statusBar(_ isHidden: Bool) {
+    open func statusBar(_ isHidden: Bool) {
         if self.viewController as? UIViewController.Base != nil {
             (self.viewController as? UIViewController.Base)?.statusBarHidden = isHidden
             ((self.viewController as? UIViewController.Base)?.navigationController as? UINavigationController.Base)?.statusBarHidden = isHidden

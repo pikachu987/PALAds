@@ -33,21 +33,21 @@ extension Ads {
         public var defaultKey: String = ""
         public var defaultCount: Int = 0
         
-        public class func update(_ adUnitID: String, defaultKey: String = "", defaultCount: Int = 1) {
+        open class func update(_ adUnitID: String, defaultKey: String = "", defaultCount: Int = 1) {
             self.shared.update(adUnitID, defaultKey: defaultKey, defaultCount: defaultCount)
         }
         
-        public class func load(_ viewController: UIViewController, adsType: AdsType = .default, callback: ((String?) -> Void)? = nil) {
+        open class func load(_ viewController: UIViewController, adsType: AdsType = .default, callback: ((String?) -> Void)? = nil) {
             self.shared.load(viewController, adsType: adsType, callback: callback)
         }
 
-        public func update(_ adUnitID: String, defaultKey: String = "", defaultCount: Int = 1) {
+        open func update(_ adUnitID: String, defaultKey: String = "", defaultCount: Int = 1) {
             self.defaultAdUnitID = adUnitID
             self.defaultKey = defaultKey
             self.defaultCount = defaultCount
         }
 
-        public func load(_ viewController: UIViewController, adsType: AdsType = .default, callback: ((String?) -> Void)? = nil) {
+        open func load(_ viewController: UIViewController, adsType: AdsType = .default, callback: ((String?) -> Void)? = nil) {
             self.callback = nil
             self.viewController = nil
             self.rewardType = nil
