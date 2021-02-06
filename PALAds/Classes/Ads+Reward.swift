@@ -37,8 +37,8 @@ extension Ads {
             self.shared.update(adUnitID, defaultKey: defaultKey, defaultCount: defaultCount)
         }
         
-        public class func load(_ viewController: UIViewController, adType: AdType = .default, callback: ((String?) -> Void)? = nil) {
-            self.shared.load(viewController, adType: adType, callback: callback)
+        public class func load(_ viewController: UIViewController, adsType: AdsType = .default, callback: ((String?) -> Void)? = nil) {
+            self.shared.load(viewController, adsType: adsType, callback: callback)
         }
 
         public func update(_ adUnitID: String, defaultKey: String = "", defaultCount: Int = 1) {
@@ -47,7 +47,7 @@ extension Ads {
             self.defaultCount = defaultCount
         }
 
-        public func load(_ viewController: UIViewController, adType: AdType = .default, callback: ((String?) -> Void)? = nil) {
+        public func load(_ viewController: UIViewController, adsType: AdsType = .default, callback: ((String?) -> Void)? = nil) {
             self.callback = nil
             self.viewController = nil
             self.rewardType = nil
@@ -55,11 +55,11 @@ extension Ads {
             var adUnitID = ""
             var key = ""
             var count = 0
-            if adType == .default {
+            if adsType == .default {
                 adUnitID = self.defaultAdUnitID
                 key = self.defaultKey
                 count = self.defaultCount
-            } else if case let .custom(customAdUnitID, customKey, customCount) = adType {
+            } else if case let .custom(customAdUnitID, customKey, customCount) = adsType {
                 adUnitID = customAdUnitID
                 key = customKey ?? ""
                 count = customCount
@@ -133,13 +133,13 @@ extension Ads.Reward: GADRewardedAdDelegate {
     }
 }
 
-// MARK: Ads.Reward + AdType
+// MARK: Ads.Reward + AdsType
 extension Ads.Reward {
-    public enum AdType {
+    public enum AdsType {
         case `default`
         case custom(String, String?, Int)
         
-        public static func ==(lhs: AdType, rhs: AdType) -> Bool {
+        public static func ==(lhs: AdsType, rhs: AdsType) -> Bool {
             switch (lhs, rhs) {
             case (.default, .default):
                 return true
@@ -150,7 +150,7 @@ extension Ads.Reward {
             }
         }
         
-        public static func ===(lhs: AdType, rhs: AdType) -> Bool {
+        public static func ===(lhs: AdsType, rhs: AdsType) -> Bool {
             switch (lhs, rhs) {
             case (.default, .default):
                 return true

@@ -1,9 +1,9 @@
 # PALAds
 
 [![CI Status](https://img.shields.io/travis/pikachu987/PALAds.svg?style=flat)](https://travis-ci.org/pikachu987/PALAds)
-[![Version](https://img.shields.io/cocoapods/v/PALAds.svg?style=flat)](https://cocoapods.org/pods/PALAds)
-[![License](https://img.shields.io/cocoapods/l/PALAds.svg?style=flat)](https://cocoapods.org/pods/PALAds)
-[![Platform](https://img.shields.io/cocoapods/p/PALAds.svg?style=flat)](https://cocoapods.org/pods/PALAds)
+![Version](https://img.shields.io/badge/pod-v0.1.0-orange)
+![License](https://img.shields.io/badge/license-MIT-%23373737)
+![Platform](https://img.shields.io/badge/platform-ios-lightgrey)
 ![](https://img.shields.io/badge/Supported-iOS9%20%7C%20OSX%2010.9-4BC51D.svg?style=flat-square)
 ![](https://img.shields.io/badge/Swift-5.0-orange.svg?style=flat)
 
@@ -19,7 +19,7 @@ PALAds is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'PALAds'
+pod 'PALAds', :git => 'https://github.com/pikachu987/PALAds.git'
 ```
 
 ```

@@ -44,8 +44,8 @@ extension Ads {
             self.shared.updateInitial(adUnitID, defaultKey: defaultKey, defaultCount: defaultCount)
         }
 
-        public class func load(_ viewController: UIViewController, adType: AdType, callback: (() -> Void)? = nil) {
-            self.shared.load(viewController, adType: adType, callback: callback)
+        public class func load(_ viewController: UIViewController, adsType: AdsType, callback: (() -> Void)? = nil) {
+            self.shared.load(viewController, adsType: adsType, callback: callback)
         }
 
         public func update(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
@@ -60,19 +60,19 @@ extension Ads {
             self.initialCount = defaultCount
         }
         
-        public func load(_ viewController: UIViewController, adType: AdType, callback: (() -> Void)? = nil) {
+        public func load(_ viewController: UIViewController, adsType: AdsType, callback: (() -> Void)? = nil) {
             var adUnitID = ""
             var key = ""
             var count = 0
-            if adType == .default {
+            if adsType == .default {
                 adUnitID = self.defaultAdUnitID
                 key = self.defaultKey
                 count = self.defaultCount
-            } else if adType == .initial {
+            } else if adsType == .initial {
                 adUnitID = self.initialAdUnitID
                 key = self.initialKey
                 count = self.initialCount
-            } else if case let .custom(customAdUnitID, customKey, customCount) = adType {
+            } else if case let .custom(customAdUnitID, customKey, customCount) = adsType {
                 adUnitID = customAdUnitID
                 key = customKey ?? ""
                 count = customCount
@@ -145,14 +145,14 @@ extension Ads.Interstitial: GADInterstitialDelegate {
     public func interstitialWillLeaveApplication(_ ad: GADInterstitial) { }
 }
 
-// MARK: Ads.Interstitial + AdType
+// MARK: Ads.Interstitial + AdsType
 extension Ads.Interstitial {
-    public enum AdType {
+    public enum AdsType {
         case `default`
         case initial
         case custom(String, String?, Int)
         
-        public static func ==(lhs: AdType, rhs: AdType) -> Bool {
+        public static func ==(lhs: AdsType, rhs: AdsType) -> Bool {
             switch (lhs, rhs) {
             case (.default, .default):
                 return true
@@ -165,7 +165,7 @@ extension Ads.Interstitial {
             }
         }
         
-        public static func ===(lhs: AdType, rhs: AdType) -> Bool {
+        public static func ===(lhs: AdsType, rhs: AdsType) -> Bool {
             switch (lhs, rhs) {
             case (.default, .default):
                 return true

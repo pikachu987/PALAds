@@ -14,4 +14,3 @@ script:
 - xcodebuild -showsdks
 - xcodebuild -list
 - set -o pipefail && xcodebuild test -workspace Example/PALAds.xcworkspace -scheme PALAds-Example -destination 'platform=iOS Simulator,name=iPhone 12,OS=14.2' | xcpretty
-- pod lib lint
