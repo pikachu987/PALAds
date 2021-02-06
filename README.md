@@ -1,7 +1,6 @@
 # PALAds
 
 [![CI Status](https://img.shields.io/travis/pikachu987/PALAds.svg?style=flat)](https://travis-ci.org/pikachu987/PALAds)
-![Version](https://img.shields.io/badge/pod-v0.1.0-orange)
 ![License](https://img.shields.io/badge/license-MIT-%23373737)
 ![Platform](https://img.shields.io/badge/platform-ios-lightgrey)
 ![](https://img.shields.io/badge/Supported-iOS9%20%7C%20OSX%2010.9-4BC51D.svg?style=flat-square)
