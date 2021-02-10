@@ -73,7 +73,7 @@ extension Ads {
                     self.adsLoad(adUnitID, callback: callback)
                 } else {
                     let keyValue = UserDefaults.standard.integer(forKey: key) + 1
-                    UserDefaults.standard.set(count, forKey: key)
+                    UserDefaults.standard.set(keyValue, forKey: key)
                     UserDefaults.standard.synchronize()
                     if keyValue % count == 0 {
                         self.callback = callback
