@@ -24,7 +24,7 @@ import GoogleMobileAds
 extension Ads {
     open class Reward: Ads {
         private static let _sharedReward = Reward()
-        public override class var shared: Ads {
+        open override class var shared: Ads {
             return self._sharedReward
         }
         

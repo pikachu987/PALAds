@@ -24,7 +24,7 @@ import GoogleMobileAds
 extension Ads {
     open class Interstitial: Ads {
         private static let _sharedInterstitial = Interstitial()
-        public override class var shared: Ads {
+        open override class var shared: Ads {
             return self._sharedInterstitial
         }
 

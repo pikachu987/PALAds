@@ -23,7 +23,7 @@ import GoogleMobileAds
 
 open class Ads: NSObject {
     private static let _sharedAds = Ads()
-    public class var shared: Ads {
+    open class var shared: Ads {
         return self._sharedAds
     }
 
