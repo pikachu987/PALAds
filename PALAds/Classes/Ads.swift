@@ -20,27 +20,122 @@
 
 import UIKit
 import GoogleMobileAds
-import PALExtension
 
 open class Ads: NSObject {
-    public weak var viewController: UIViewController?
+    private static let _sharedAds = Ads()
+    public class var shared: Ads {
+        return self._sharedAds
+    }
+
+    public typealias Callback = (value: String?, error: Error?)
+    
+    private var currentWindow: UIWindow? {
+        if let window = UIApplication.shared.keyWindow {
+            return window
+        } else {
+            return UIApplication.shared.windows.first
+        }
+    }
+
+    
+    var callback: ((Callback) -> Void)? = nil
+    
+    var currentViewController: UIViewController? {
+        return self.currentWindow?.currentViewController
+    }
     
     open class func start(_ callback: ((GADInitializationStatus) -> Void)? = nil) {
         GADMobileAds.sharedInstance().start { (GADInitializationStatus) in
             callback?(GADInitializationStatus)
         }
     }
-
-    open func statusBar(_ isHidden: Bool) {
-        if self.viewController as? UIViewController.Base != nil {
-            (self.viewController as? UIViewController.Base)?.statusBarHidden = isHidden
-            ((self.viewController as? UIViewController.Base)?.navigationController as? UINavigationController.Base)?.statusBarHidden = isHidden
-        } else if self.viewController as? UINavigationController.Base != nil {
-            (self.viewController as? UINavigationController.Base)?.statusBarHidden = isHidden
-        } else if self.viewController as? UITabBarController.Base != nil {
-            (self.viewController as? UITabBarController.Base)?.statusBarHidden = isHidden
-            ((self.viewController as? UITabBarController.Base)?.navigationController as? UINavigationController.Base)?.statusBarHidden = isHidden
+    
+    open func shouldLoadAds(_ adUnitID: String, saveStorageKey: String, showedCount: Int) -> Bool {
+        return true
+    }
+    
+    open class func customLoad(_ adUnitID: String, saveStorageKey: String, perCount: Int, callback: ((Ads.Callback) -> Void)? = nil) {
+        self.shared.load(adUnitID, saveStorageKey: saveStorageKey, perCount: perCount, callback: callback)
+    }
+    
+    func load(_ adsData: AdsData, callback: ((Callback) -> Void)? = nil) {
+        self.load(adsData.adUnitID, saveStorageKey: adsData.saveStorageKey, perCount: adsData.perCount, callback: callback)
+    }
+    
+    func load(_ adUnitID: String, saveStorageKey: String, perCount: Int, callback: ((Callback) -> Void)? = nil) {
+        if adUnitID == "" {
+            fatalError("No Ad Unit ID")
+        } else {
+            if saveStorageKey == "" {
+                self.adsLoad(adUnitID, callback: callback)
+            } else {
+                var saveStorageKeyValue = UserDefaults.standard.integer(forKey: saveStorageKey)
+                if self.shouldLoadAds(adUnitID, saveStorageKey: saveStorageKey, showedCount: saveStorageKeyValue) {
+                    saveStorageKeyValue += 1
+                    UserDefaults.standard.set(saveStorageKeyValue, forKey: saveStorageKey)
+                    UserDefaults.standard.synchronize()
+                    if saveStorageKeyValue % perCount == 0 {
+                        self.adsLoad(adUnitID, callback: callback)
+                    } else {
+                        callback?((value: nil, error: nil))
+                    }
+                } else {
+                    callback?((value: nil, error: nil))
+                }
+            }
         }
-        self.viewController?.setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    func adsLoad(_ adUnitID: String, callback: ((Callback) -> Void)? = nil) {
+        
+    }
+}
+
+// MARK: Ads + AdsData
+extension Ads {
+    public struct AdsData {
+        public var adUnitID: String
+        public var saveStorageKey: String
+        public var perCount: Int
+
+        public init(adUnitID: String = "", saveStorageKey: String = "", perCount: Int = 0) {
+            self.adUnitID = adUnitID
+            self.saveStorageKey = saveStorageKey
+            self.perCount = perCount
+        }
+        
+        public mutating func update(adUnitID: String = "", saveStorageKey: String = "", perCount: Int = 0) {
+            self.adUnitID = adUnitID
+            self.saveStorageKey = saveStorageKey
+            self.perCount = perCount
+        }
+    }
+}
+
+fileprivate extension UIWindow {
+    var currentViewController: UIViewController? {
+        return self.currentViewController(viewController: self.rootViewController)
+    }
+
+    private func currentViewController(viewController: UIViewController?) -> UIViewController? {
+        if let viewController = viewController as? UINavigationController {
+            if let currentVC = viewController.visibleViewController {
+                return self.currentViewController(viewController: currentVC)
+            } else {
+                return viewController
+            }
+        } else if let viewController = viewController as? UITabBarController {
+            if let currentVC = viewController.selectedViewController {
+                return self.currentViewController(viewController: currentVC)
+            } else {
+                return viewController
+            }
+        } else {
+            if let currentVC = viewController?.presentedViewController {
+                return self.currentViewController(viewController: currentVC)
+            } else {
+                return viewController
+            }
+        }
     }
 }

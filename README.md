@@ -33,6 +33,10 @@ pod 'PALAds', :git => 'https://github.com/pikachu987/PALAds.git'
 </array>
 ```
 
+```
+Other Linker Flags -ObjC
+```
+
 ## Author
 
 pikachu987, pikachu77769@gmail.com

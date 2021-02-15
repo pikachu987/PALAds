@@ -23,159 +23,68 @@ import GoogleMobileAds
 
 extension Ads {
     open class Interstitial: Ads {
-        public static let shared = Interstitial()
+        private static let _sharedInterstitial = Interstitial()
+        public override class var shared: Ads {
+            return self._sharedInterstitial
+        }
 
-        private var ad: GADInterstitial?
-        private var callback: (() -> Void)? = nil
+        public static var property = AdsProperty()
         
-        public var defaultAdUnitID: String = ""
-        public var defaultKey: String = ""
-        public var defaultCount: Int = 0
-
-        public var initialAdUnitID: String = ""
-        public var initialKey: String = ""
-        public var initialCount: Int = 0
-
-        open class func update(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
-            self.shared.update(adUnitID, defaultKey: defaultKey, defaultCount: defaultCount)
+        private var ad: GADInterstitialAd?
+        
+        open class func initialLoad(_ callback: ((Ads.Callback) -> Void)? = nil) {
+            self.shared.load(self.property.initial, callback: callback)
         }
 
-        open class func updateInitial(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
-            self.shared.updateInitial(adUnitID, defaultKey: defaultKey, defaultCount: defaultCount)
-        }
-
-        open class func load(_ viewController: UIViewController, adsType: AdsType, callback: (() -> Void)? = nil) {
-            self.shared.load(viewController, adsType: adsType, callback: callback)
-        }
-
-        open func update(_ adUnitID: String, defaultKey: String, defaultCount: Int = 5) {
-            self.defaultAdUnitID = adUnitID
-            self.defaultKey = defaultKey
-            self.defaultCount = defaultCount
+        open class func defaultLoad(_ callback: ((Ads.Callback) -> Void)? = nil) {
+            self.shared.load(self.property.default, callback: callback)
         }
         
-        open func updateInitial(_ adUnitID: String, defaultKey: String, defaultCount: Int = 3) {
-            self.initialAdUnitID = adUnitID
-            self.initialKey = defaultKey
-            self.initialCount = defaultCount
-        }
-        
-        open func load(_ viewController: UIViewController, adsType: AdsType, callback: (() -> Void)? = nil) {
-            var adUnitID = ""
-            var key = ""
-            var count = 0
-            if adsType == .default {
-                adUnitID = self.defaultAdUnitID
-                key = self.defaultKey
-                count = self.defaultCount
-            } else if adsType == .initial {
-                adUnitID = self.initialAdUnitID
-                key = self.initialKey
-                count = self.initialCount
-            } else if case let .custom(customAdUnitID, customKey, customCount) = adsType {
-                adUnitID = customAdUnitID
-                key = customKey ?? ""
-                count = customCount
-            }
-            if adUnitID == "" {
-                fatalError("No Ad Unit ID")
-            } else {
-                if key == "" {
-                    self.callback = callback
-                    self.viewController = viewController
-                    self.adsLoad(adUnitID)
-                } else {
-                    let keyValue = UserDefaults.standard.integer(forKey: key) + 1
-                    UserDefaults.standard.set(keyValue, forKey: key)
-                    UserDefaults.standard.synchronize()
-                    if keyValue % count == 0 {
-                        self.callback = callback
-                        self.viewController = viewController
-                        self.adsLoad(adUnitID)
-                    } else {
-                        callback?()
-                    }
+        override func adsLoad(_ adUnitID: String, callback: ((Ads.Callback) -> Void)? = nil) {
+            let request = GADRequest()
+            GADInterstitialAd.load(withAdUnitID: adUnitID, request: request, completionHandler: { [weak self] (ad, error) in
+                if let error = error {
+                    callback?((value: nil, error: error))
+                    return
                 }
-            }
-        }
-        
-        private func adsLoad(_ adUnitID: String) {
-            self.statusBar(true)
-            self.ad = GADInterstitial(adUnitID: adUnitID)
-            self.ad?.delegate = self
-            self.ad?.load(GADRequest())
+                guard let self = self, let ad = ad, let currentViewController = self.currentViewController else {
+                    callback?((value: nil, error: NSError(domain: "Error Ad", code: 503, userInfo: nil) as Error))
+                    return
+                }
+                self.callback = callback
+                self.ad = ad
+                self.ad?.fullScreenContentDelegate = self
+                self.ad?.present(fromRootViewController: currentViewController)
+            })
         }
     }
 }
 
-// MARK: Ads.Interstitial: GADInterstitialDelegate
-extension Ads.Interstitial: GADInterstitialDelegate {
-    // Tells the delegate an ad request succeeded.
-    public func interstitialDidReceiveAd(_ ad: GADInterstitial) {
-        guard let viewController = self.viewController else { return }
-        if ad.isReady {
-            ad.present(fromRootViewController: viewController)
-        }
+// MARK: Ads.Interstitial: GADFullScreenContentDelegate
+extension Ads.Interstitial: GADFullScreenContentDelegate {
+    public func adDidRecordImpression(_ ad: GADFullScreenPresentingAd) {
     }
-
-    // Tells the delegate an ad request failed.
-    public func interstitial(_ ad: GADInterstitial, didFailToReceiveAdWithError error: GADRequestError) {
-        self.statusBar(false)
-        self.viewController = nil
-        self.callback?()
+    
+    public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        self.callback?((value: nil, error: error))
         self.callback = nil
+        self.ad = nil
     }
 
-    // Tells the delegate the interstitial had been animated off the screen.
-    public func interstitialDidDismissScreen(_ ad: GADInterstitial) {
-        self.statusBar(false)
-        self.viewController = nil
-        self.callback?()
+    public func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    }
+    
+    public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+        self.callback?((value: self.ad?.adUnitID, error: nil))
         self.callback = nil
+        self.ad = nil
     }
-
-    // Tells the delegate that an interstitial will be presented.
-    public func interstitialWillPresentScreen(_ ad: GADInterstitial) { }
-
-    // Tells the delegate the interstitial is to be animated off the screen.
-    public func interstitialWillDismissScreen(_ ad: GADInterstitial) { }
-
-    // Tells the delegate that a user click will open another app
-    // (such as the App Store), backgrounding the current app.
-    public func interstitialWillLeaveApplication(_ ad: GADInterstitial) { }
 }
 
-// MARK: Ads.Interstitial + AdsType
+// MARK: Ads.Interstitial + AdsProperty
 extension Ads.Interstitial {
-    public enum AdsType {
-        case `default`
-        case initial
-        case custom(String, String?, Int)
-        
-        public static func ==(lhs: AdsType, rhs: AdsType) -> Bool {
-            switch (lhs, rhs) {
-            case (.default, .default):
-                return true
-            case (.initial, .initial):
-                return true
-            case (.custom, .custom):
-                return true
-            default:
-                return false
-            }
-        }
-        
-        public static func ===(lhs: AdsType, rhs: AdsType) -> Bool {
-            switch (lhs, rhs) {
-            case (.default, .default):
-                return true
-            case (.initial, .initial):
-                return true
-            case let (.custom(adUnitID1, forKey1, count1), .custom(adUnitID2, forKey2, count2)):
-                return adUnitID1 == adUnitID2 && forKey1 == forKey2 && count1 == count2
-            default:
-                return false
-            }
-        }
+    public struct AdsProperty {
+        public var `default` = AdsData()
+        public var initial = AdsData()
     }
 }

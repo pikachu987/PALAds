@@ -23,142 +23,66 @@ import GoogleMobileAds
 
 extension Ads {
     open class Reward: Ads {
-        public static let shared = Reward()
+        private static let _sharedReward = Reward()
+        public override class var shared: Ads {
+            return self._sharedReward
+        }
+        
+        public static var property = AdsProperty()
 
         private var ad: GADRewardedAd?
-        private var callback: ((String?) -> Void)? = nil
         private var rewardType: String?
-
-        public var defaultAdUnitID: String = ""
-        public var defaultKey: String = ""
-        public var defaultCount: Int = 0
         
-        open class func update(_ adUnitID: String, defaultKey: String = "", defaultCount: Int = 1) {
-            self.shared.update(adUnitID, defaultKey: defaultKey, defaultCount: defaultCount)
+        open class func defaultLoad(_ callback: ((Ads.Callback) -> Void)? = nil) {
+            self.shared.load(self.property.default, callback: callback)
         }
         
-        open class func load(_ viewController: UIViewController, adsType: AdsType = .default, callback: ((String?) -> Void)? = nil) {
-            self.shared.load(viewController, adsType: adsType, callback: callback)
-        }
-
-        open func update(_ adUnitID: String, defaultKey: String = "", defaultCount: Int = 1) {
-            self.defaultAdUnitID = adUnitID
-            self.defaultKey = defaultKey
-            self.defaultCount = defaultCount
-        }
-
-        open func load(_ viewController: UIViewController, adsType: AdsType = .default, callback: ((String?) -> Void)? = nil) {
-            self.callback = nil
-            self.viewController = nil
-            self.rewardType = nil
-
-            var adUnitID = ""
-            var key = ""
-            var count = 0
-            if adsType == .default {
-                adUnitID = self.defaultAdUnitID
-                key = self.defaultKey
-                count = self.defaultCount
-            } else if case let .custom(customAdUnitID, customKey, customCount) = adsType {
-                adUnitID = customAdUnitID
-                key = customKey ?? ""
-                count = customCount
-            }
-            if adUnitID == "" {
-                fatalError("No Ad Unit ID")
-            } else {
-                if key == "" {
-                    self.callback = callback
-                    self.viewController = viewController
-                    self.adsLoad(adUnitID, callback: callback)
-                } else {
-                    let keyValue = UserDefaults.standard.integer(forKey: key) + 1
-                    UserDefaults.standard.set(keyValue, forKey: key)
-                    UserDefaults.standard.synchronize()
-                    if keyValue % count == 0 {
-                        self.callback = callback
-                        self.viewController = viewController
-                        self.adsLoad(adUnitID, callback: callback)
-                    } else {
-                        callback?(nil)
-                    }
+        override func adsLoad(_ adUnitID: String, callback: ((Ads.Callback) -> Void)? = nil) {
+            let request = GADRequest()
+            GADRewardedAd.load(withAdUnitID: adUnitID, request: request) { [weak self] (ad, error) in
+                if let error = error {
+                    callback?((value: nil, error: error))
+                    return
                 }
-            }
-        }
-        
-        private func adsLoad(_ adUnitID: String, callback: ((String?) -> Void)? = nil) {
-            guard let viewController = viewController else { return }
-            if self.ad != nil && self.ad?.isReady == true {
-                self.statusBar(true)
-                self.ad?.present(fromRootViewController: viewController, delegate: self)
-            } else {
-                self.ad = GADRewardedAd(adUnitID: adUnitID)
-                self.ad?.load(GADRequest(), completionHandler: { [weak viewController] (error) in
-                    guard let viewController = viewController else { return }
-                    if self.ad?.isReady == true {
-                        self.statusBar(true)
-                        self.ad?.present(fromRootViewController: viewController, delegate: self)
-                    } else {
-                        self.callback?(nil)
-                    }
+                guard let self = self, let ad = ad, let currentViewController = self.currentViewController else {
+                    callback?((value: nil, error: NSError(domain: "Error Ad", code: 503, userInfo: nil) as Error))
+                    return
+                }
+                self.callback = callback
+                self.ad = ad
+                self.ad?.fullScreenContentDelegate = self
+                self.ad?.present(fromRootViewController: currentViewController, userDidEarnRewardHandler: { [weak self] in
+                    self?.rewardType = self?.ad?.adReward.type
                 })
             }
         }
     }
 }
 
-// MARK: Ads.Reward: GADRewardedAdDelegate
-extension Ads.Reward: GADRewardedAdDelegate {
-    // Reward received
-    public func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
-        self.rewardType = reward.type
+// MARK: Ads.Reward: GADFullScreenContentDelegate
+extension Ads.Reward: GADFullScreenContentDelegate {
+    public func adDidRecordImpression(_ ad: GADFullScreenPresentingAd) {
     }
     
-    // Rewarded ad failed to present
-    public func rewardedAd(_ rewardedAd: GADRewardedAd, didFailToPresentWithError error: Error) {
-        self.statusBar(false)
-        self.viewController = nil
-    }
-
-    // Rewarded ad to present
-    public func rewardedAdDidPresent(_ rewardedAd: GADRewardedAd) {
-    }
-
-    // Rewarded ad dismissed
-    public func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
-        self.statusBar(false)
-        self.viewController = nil
-        self.callback?(self.rewardType)
+    public func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        self.callback?((value: nil, error: error))
         self.callback = nil
+        self.ad = nil
+    }
+
+    public func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    }
+    
+    public func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+        self.callback?((value: self.rewardType, error: nil))
+        self.callback = nil
+        self.ad = nil
     }
 }
 
-// MARK: Ads.Reward + AdsType
+// MARK: Ads.Reward + AdsProperty
 extension Ads.Reward {
-    public enum AdsType {
-        case `default`
-        case custom(String, String?, Int)
-        
-        public static func ==(lhs: AdsType, rhs: AdsType) -> Bool {
-            switch (lhs, rhs) {
-            case (.default, .default):
-                return true
-            case (.custom, .custom):
-                return true
-            default:
-                return false
-            }
-        }
-        
-        public static func ===(lhs: AdsType, rhs: AdsType) -> Bool {
-            switch (lhs, rhs) {
-            case (.default, .default):
-                return true
-            case let (.custom(adUnitID1, forKey1, count1), .custom(adUnitID2, forKey2, count2)):
-                return adUnitID1 == adUnitID2 && forKey1 == forKey2 && count1 == count2
-            default:
-                return false
-            }
-        }
+    public struct AdsProperty {
+        public var `default` = AdsData()
     }
 }
