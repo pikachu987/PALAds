@@ -50,6 +50,7 @@ extension Ads {
                 }
                 self.callback = callback
                 self.ad = ad
+                self.rewardType = nil
                 self.ad?.fullScreenContentDelegate = self
                 self.ad?.present(fromRootViewController: currentViewController, userDidEarnRewardHandler: { [weak self] in
                     self?.rewardType = self?.ad?.adReward.type
