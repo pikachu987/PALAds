@@ -33,8 +33,6 @@ PODS:
   - nanopb/encode (2.30907.0)
   - PALAds (0.1.4):
     - Google-Mobile-Ads-SDK (= 8.0.0)
-    - PALExtension (>= 0.1.11)
-  - PALExtension (0.1.11)
   - PromisesObjC (1.2.12)
 
 DEPENDENCIES:
@@ -47,7 +45,6 @@ SPEC REPOS:
     - GoogleUserMessagingPlatform
     - GoogleUtilities
     - nanopb
-    - PALExtension
     - PromisesObjC
 
 EXTERNAL SOURCES:
@@ -60,8 +57,7 @@ SPEC CHECKSUMS:
   GoogleUserMessagingPlatform: b168e8c46cd8f92aa3e34b584c4ca78a411ce367
   GoogleUtilities: 31c5b01f978a70c6cff2afc6272b3f1921614b43
   nanopb: 59221d7f958fb711001e6a449489542d92ae113e
-  PALAds: 1648e889fd0bf2da4bf7872da96711d9e7e8e965
-  PALExtension: 761025c60d47cce530697964b06598c94f4e94a0
+  PALAds: 74ea27eea42f6b1e2eb8f101a39cab274b83cb4b
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
 
 PODFILE CHECKSUM: c8d1f8b9f9ce8ccf881a437faac333ca30a0c2f1
