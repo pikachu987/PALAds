@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'PALAds'
-  s.version          = '0.1.6'
+  s.version          = '0.1.7'
   s.summary          = 'PALAds'
   s.description      = <<-DESC
 My Lib PALAds
@@ -21,5 +21,5 @@ My Lib PALAds
   s.source_files = 'PALAds/Classes/**/*'
   s.swift_version = '5.0'
   s.static_framework = true
-  s.dependency 'Google-Mobile-Ads-SDK', '8.0.0'
+  s.dependency 'Google-Mobile-Ads-SDK', '8.3.0'
 end

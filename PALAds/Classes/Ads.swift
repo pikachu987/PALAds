@@ -20,6 +20,8 @@
 
 import UIKit
 import GoogleMobileAds
+import AppTrackingTransparency
+import AdSupport
 
 open class Ads: NSObject {
     private static let _sharedAds = Ads()
@@ -47,6 +49,16 @@ open class Ads: NSObject {
     open class func start(_ callback: ((GADInitializationStatus) -> Void)? = nil) {
         GADMobileAds.sharedInstance().start { (GADInitializationStatus) in
             callback?(GADInitializationStatus)
+        }
+    }
+    
+    open class func requestTrackingAuthorization(_ callback: (() -> Void)? = nil) {
+        if #available(iOS 14, *) {
+            ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
+                callback?()
+            })
+        } else {
+            callback?()
         }
     }
     
